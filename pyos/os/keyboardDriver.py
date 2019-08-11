@@ -19,8 +19,7 @@ class KeyboardDriver(DeviceDriver):
 
         # check if the given character is valid...
        
-        if (key_code >= 65 and key_code <= 90 or   # A..Z 
-        key_code >= 97 and key_code <= 123):       # a..z
-            # if is_shifted:
-            char = chr(key_code)
-            _globals._console.write(char)
+        # if (key_code >= 65 and key_code <= 90 or   # A..Z 
+        # key_code >= 97 and key_code <= 123):       # a..z
+        char = chr(key_code)
+        _globals._console.write(char)

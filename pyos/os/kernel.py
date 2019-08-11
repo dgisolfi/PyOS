@@ -2,7 +2,11 @@ from .queue import Queue
 from .console import Console
 from .keyboardDriver import KeyboardDriver
 from pyos.globals import _globals
-
+import logging
+logging.basicConfig(
+    filename='pyos.log', 
+    level=logging.INFO
+)
 
 class Kernel:
     def __init__(self):
@@ -30,7 +34,7 @@ class Kernel:
 
     def krnTrace(self, msg):
         if _globals._trace:
-            pass
+            logging.info(msg)
             # _globals._console.write(msg)
             # print(msg)
 
@@ -46,7 +50,7 @@ class Kernel:
         # elif _globals._cpu.is_executing:
         #     _globals._cpu.cycle()
         else:
-            self.krnTrace('idle') #
+            self.krnTrace('idle')
 
     def krnInterruptHandler(self, irq, params):
         self.krnTrace(f'Handling IRQ~ {irq}')
