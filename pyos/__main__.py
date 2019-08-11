@@ -14,6 +14,9 @@ def main():
     while True:
         time.sleep(_globals._CPU_CLOCK_INTERVAL)
         devices.hostClockPulse()
+
+        key = _globals._console.screen.getch()
+        _globals._console.onKeyPress(key)
     
     
 

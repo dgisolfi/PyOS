@@ -7,22 +7,26 @@ class Console:
 		self.x_position = 0
 		self.y_position = 0
 		self.buffer = ''
-		self.screen = object
 		self.cmd_history = []
 		self.cmd_index = []
-		self.curse = curses.wrapper(self._setup)
-  	
-	def _setup(self, stdscr):
+		self.curses = curses
+		self.screen = self._setup()
+			
+	def _setup(self):
 		# reset x and y pos
 		self.resetXY()
+		screen = curses.initscr()
 		# Use the color of the existing terminal
 		curses.start_color()
 		curses.use_default_colors()
+		curses.noecho()
+		# create the screen
+		
 		# Clear screen
-		stdscr.clear()
-		stdscr.keypad(1)
-		self.screen = stdscr
-		self.refresh()
+		screen.clear()
+		screen.keypad(1)
+		
+		return screen
 
 	def clear(self):
 		self.screen.clear()
@@ -34,19 +38,19 @@ class Console:
 	def onKeyPress(self, key):
 		_globals._kernel_interrupt_queue.enqueue(Interrupt(_globals.KEYBOARD_IRQ, key))
 
-	def refresh(self):
-		key = self.screen.getch()
-		# while key != ord('q'):
-		# must be first
-		# self.screen = stdscr
-		self.onKeyPress(key)
-		# self.write(str(_globals._kernel_interrupt_queue.length()))
-		self.screen.refresh() 
-
+	
 	def write(self, string):
-		# print(string)
-		self.screen.addstr(0,0, string)
-		self.screen.refresh() 
+		if len(string) == 1:
+			self.screen.addch(self.y_position, self.x_position, string)
+			self.x_position += 1
+			# TODO: check for out of bounds
+		else:
+			for char in string:
+				self.screen.addch(self.y_position, self.x_position, char)
+				self.x_position += 1
+				# TODO: check for out of bounds
+		
+		self.screen.refresh()
 			
 	# def handleInput(self):
 	# 	# while ()

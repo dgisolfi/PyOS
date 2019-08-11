@@ -40,8 +40,6 @@ class Kernel:
         pass
 
     def krnOnCPUClockPulse(self):
-        _globals._console.refresh()
-        # _globals._console.write(str(_globals._kernel_interrupt_queue.length()))
         if _globals._kernel_interrupt_queue.length() > 0:
             interrupt = _globals._kernel_interrupt_queue.dequeue()
             self.krnInterruptHandler(interrupt.irq, interrupt.params)
