@@ -11,7 +11,7 @@ class Globals:
         self.KEYBOARD_IRQ = 1
 
         """ global variables """
-        self._cpu = None
+        self._cpu = object
         self._os_clock = 0
         # (currently unused)  0 = Kernel Mode, 1 = User Mode
         self._mode = 0
@@ -19,20 +19,20 @@ class Globals:
         self._trace = True
 
         # Os Kernal
-        self._kernel = None
-        self._kernel_interrupt_queue = None
-        self._kernel_input_queue = None
+        self._kernel = object
+        self._kernel_interrupt_queue = object
+        self._kernel_input_queue = object
         self._kernel_buffers = []
         
-        self._console = None
-        self._shell = None
+        self._console = object
+        self._shell = object
 
-        self._devices = None
+        self._devices = object
 
         self._sarcastic_mode = False
 
-        self._krn_keyboard_driver = None
-        self._hardware_clock_id = None
+        self._krn_keyboard_driver = object
+        self._hardware_clock_id = object
         
         self._utils = Utils()
         

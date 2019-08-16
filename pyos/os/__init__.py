@@ -1,2 +1,2 @@
-from .console import *
-from .kernel import *
+from .console import Console
+from .kernel import Kernel
