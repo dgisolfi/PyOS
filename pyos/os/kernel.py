@@ -6,13 +6,19 @@ from pyos.globals import _globals
 import logging
 import sys
 
-# TODO: This is ugly put this inside the class 
-logging.basicConfig(
-    filename='pyos.log', 
-    level=logging.INFO
-)
 
 class Kernel:
+    def __init__(self):
+        self.logger = self.configLogger()
+
+    def configLogger(self):
+        logger = logging.getLogger('pyos')
+        logger.setLevel(logging.INFO)
+        fh = logging.FileHandler('pyos.log')
+        fh.setLevel(logging.INFO)
+        logger.addHandler(fh)
+        return logger
+
     def bootstrap(self):
         """ Create Global Queues """
         # IRQs (Interup Requests)
@@ -68,7 +74,7 @@ class Kernel:
 
     def krnTrace(self, msg):
         if _globals._trace:
-            logging.info(msg)
+            self.logger.info(msg)
 
     def krnTimerISR(self):
         # The built-in TIMER (not clock) Interrupt Service Routine 
@@ -81,8 +87,8 @@ class Kernel:
         if _globals._kernel_interrupt_queue.length() > 0:
             interrupt = _globals._kernel_interrupt_queue.dequeue()
             self.krnInterruptHandler(interrupt.irq, interrupt.params)
-        # elif _globals._cpu.is_executing:
-        #     _globals._cpu.cycle()
+        elif _globals._cpu.is_executing:
+            _globals._cpu.cycle()
         else:
             self.krnTrace('idle')
 

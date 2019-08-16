@@ -76,7 +76,6 @@ class Console:
 				return 1
 		elif dim.lower() == 'y':
 			new = self.y_position + 1
-			_globals._kernel.krnTrace(f'before: {self.y_position}, after: {new}, max: {self.height}')
 			if (self.y_position+1) == self.height:
 				# We have hit the bottom of the terminal,
 				# we need to scroll
