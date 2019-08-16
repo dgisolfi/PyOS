@@ -1,4 +1,4 @@
-
+from .utils import Utils
 
 class Globals:
     def __init__(self):
@@ -33,6 +33,8 @@ class Globals:
 
         self._krn_keyboard_driver = None
         self._hardware_clock_id = None
+        
+        self._utils = Utils()
         
 
 

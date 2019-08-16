@@ -63,59 +63,104 @@ class Shell:
 		for arg in buffer:
 			if arg.strip() != '':
 				args.append(arg)
-
+		
 		return UserCommand(cmd, args)
 
-	def execute(self, fn:str, args=None):
+	def execute(self, fn:str, args=[]):
 		_globals._console.newLine()
 		# call the function passed and send its args along as well
-		if args is None or len(args) == 0:
-			eval(f'{fn}()')
-		else:
-			# *args
-			eval(f'{fn}({(args)})')
-
-
+		eval(f'{fn}({args})')
 		if (_globals._console.x_position > 0):
 			_globals._console.newLine()
 		self.prompt()
 
-
 	""" Shell Commands """
 
-	def invalidCommand(self):
+	def invalidCommand(self, args):
 		_globals._console.write('Invalid Command. ')
 		# TODO: Implement sarcasm mode
 		_globals._console.write('Type \'help\' for, well... help.')
 
-	def version(self):
+	# TODO: as a part of sarcastic mode....
+	def shellCurse():
+		pass
+
+	def shellApology():
+		pass
+
+	def version(self, args):
 		_globals._console.write(
 			f'{_globals._APP_NAME} v{_globals._APP_VERSION}'
 		)
 
-	def help(self):
+	def help(self, args):
 		_globals._console.write('Commands:')
 		for cmd in self.command_list:
 			_globals._console.newLine()
 			_globals._console.write(f' {cmd.command} {cmd.description}')
 
-	def shutdown(self):
+	def shutdown(self, args):
 		_globals._console.write('Shutting down...')
 		# call kernal routine, pass in 0 as status, this is a normal shutdown
 		_globals._kernel.krnShutdown(0)
 
-	def cls(self):
+	def cls(self, args):
 		_globals._console.clear()
 		_globals._console.resetXY()
 
-	def man(self):
-		pass
+	def man(self, args):
+		if len(args) > 0:
+			topic = args[0]
+			if topic == 'help':
+				_globals._console.write(
+					'Help displays a list of (hopefully) valid commands.'
+				)
+			# TODO: Make descriptive MANual page entries for the 
+			# the rest of the shell commands here.
+			else:
+				_globals._console.write(
+					f'No manual entry for {args[0]}.'
+				)
+		else:
+			_globals._console.write(
+				'Usage: man <topic>  Please supply a topic.'
+			)
+				
 
-	def trace(self):
-		pass
+	def trace(self, args):
+		if len(args) > 0:
+			setting = args[0]
+			if setting == 'on':
+				if _globals._trace and _globals._sarcastic_mode:
+					_globals._console.write('Trace is already on, doofus.')
+				else:
+					_globals._trace = True
+					_globals._console.write('Trace ON')
+			elif setting == 'off':
+				_globals._trace = False
+				_globals._console.write('Trace OFF')
+			else:
+				_globals._console.write(
+					'Invalid arguement.  Usage: trace <on | off>.'
+				)
+		else:
+			_globals._console.write('Usage: trace <on | off>')
+				
 
-	def rot13(self):
-		pass
+	def rot13(self, args):
+		if len(args) > 0:
+			_globals._console.write(
+				f'{" ".join(args)} = "{_globals._utils.rot13(" ".join(args))}"'
+				)
+		else:
+			_globals._console.write(
+				'Usage: rot13 <string>  Please supply a string.'
+				)
 
-	def setPrompt(self):
-		pass
+	def setPrompt(self, args):
+		if len(args) > 0:
+			self.prompt_str = args[0]
+		else:
+			_globals._console.write(
+				'Usage: prompt <string>  Please supply a string.'
+			)
