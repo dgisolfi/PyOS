@@ -3,15 +3,15 @@ from .console import Console
 from .keyboardDriver import KeyboardDriver
 from pyos.globals import _globals
 import logging
+import sys
+
+# TODO: This is ugly put this inside the class 
 logging.basicConfig(
     filename='pyos.log', 
     level=logging.INFO
 )
 
 class Kernel:
-    def __init__(self):
-        pass
-
     def bootstrap(self):
         """ Create Global Queues """
         # IRQs (Interup Requests)
@@ -32,15 +32,39 @@ class Kernel:
         self.krnTrace(_globals._krn_keyboard_driver.status)
 
 
+    def krnShutdown(self, status):
+        self.krnTrace('Begin shutdown OS');
+        # TODO: Check for running processes.  If there are some, alert and stop. Else...
+        # ... Disable the Interrupts.
+        self.krnTrace('Disabling the interrupts.');
+        self.krnDisableInterrupts();
+        #
+        # Unload the Device Drivers?
+        # More?
+        #
+        self.krnTrace('End shutdown OS');
+        sys.exit(status)
+    
+    """ Interrupt Handling """
+    def krnEnableInterrupts(self):
+        # Keyboard
+        _globals._devices.hostEnableKeyboardInterrupt();
+        # Put more here.
+    
+    def krnDisableInterrupts(self):
+        # Keyboard
+        _globals._devices.hostDisableKeyboardInterrupt();
+        # Put more here.
+
     def krnTrace(self, msg):
         if _globals._trace:
             logging.info(msg)
-            # _globals._console.write(msg)
-            # print(msg)
 
     def krnTimerISR(self):
-        # The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver).
-        # Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+        # The built-in TIMER (not clock) Interrupt Service Routine 
+        # (as opposed to an ISR coming from a device driver). Check 
+        # multiprogramming parameters and enforce quanta here. 
+        # Call the scheduler / context switch here if necessary.
         pass
 
     def krnOnCPUClockPulse(self):
@@ -55,9 +79,13 @@ class Kernel:
     def krnInterruptHandler(self, irq, params):
         self.krnTrace(f'Handling IRQ~ {irq}')
 
-
         if irq == _globals.TIMER_IRQ:
             self.krnTimerISR()
         elif irq == _globals.KEYBOARD_IRQ:
             _globals._krn_keyboard_driver.isr(params)
-            # _stdin.handleInput()
+            _globals._console.handleInput()
+
+    def krnTrapError(self, msg):
+        self.krnTrace(f'OS ERROR - TRAP: {msg}')
+        # set a 1 as the status as clearly something is wrong
+        self.krnShutdown(1)
