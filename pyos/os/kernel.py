@@ -1,5 +1,6 @@
 from .queue import Queue
 from .console import Console
+from .shell import Shell
 from .keyboardDriver import KeyboardDriver
 from pyos.globals import _globals
 import logging
@@ -30,6 +31,15 @@ class Kernel:
         # Call the driverEntry() initialization routine.
         _globals._krn_keyboard_driver.driver_entry()
         self.krnTrace(_globals._krn_keyboard_driver.status)
+
+       
+        """ Enable the OS Interrupts. """
+        self.krnTrace('Enabling the interrupts.');
+        self.krnEnableInterrupts()
+
+        """ Launch the shell """
+        self.krnTrace('Creating and Launching the shell.')
+        _globals._shell = Shell()
 
 
     def krnShutdown(self, status):

@@ -6,11 +6,11 @@ from pyos.host import Devices
 
 
 def main():
-    _globals._kernel = Kernel()
-    
-    _globals._kernel.bootstrap()
     _globals._devices = Devices()
 
+    _globals._kernel = Kernel()
+    _globals._kernel.bootstrap()
+    
     while True:
         time.sleep(_globals._CPU_CLOCK_INTERVAL)
         _globals._devices.hostClockPulse()

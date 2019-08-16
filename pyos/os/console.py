@@ -51,7 +51,9 @@ class Console:
 		)
 	
 	def newLine(self):
+		self.x_position = 0
 		self.y_position += self.checkBounds('y')
+		
 	
 	def write(self, string):
 		if string is '':
@@ -62,7 +64,7 @@ class Console:
 		else:
 			for char in string:
 				self.x_position += self.checkBounds('x')
-				self.screen.addch(self.y_position, self.x_position, string)
+				self.screen.addch(self.y_position, self.x_position, char)
 		self.screen.refresh()
 	
 	def checkBounds(self, dim):
@@ -93,7 +95,7 @@ class Console:
 				# The enter key marks the end of a console command, so ... 
 				# ... tell the shell ...
 				self.write(char)
-				# _globals._shell.handleInput(self.buffer);
+				_globals._shell.handleInput(self.buffer);
 				# ... and reset our buffer.
 				self.buffer = ''
 			elif char == chr(3): # Ctrl-C

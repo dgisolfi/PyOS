@@ -24,9 +24,7 @@ class Queue:
         self._queue.append(element)
 
     def dequeue(self):
-        element = self._queue[-1]
-        del self._queue[-1]
-        return element
+        return self._queue.pop(0)
     
     # Returns the object at the top of the Queue without removing it.
     def peek(self):
