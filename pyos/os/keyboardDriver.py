@@ -12,17 +12,23 @@ class KeyboardDriver(DeviceDriver):
         self.status = 'loaded'
         # More?
 
-    def krnKbdDispatchKeyPress(self, key):
-        # because key is passed in as a tuple it can be unpacked cleanly
-        _globals._console.write(f'HERE: {key}')
-        # key_code = int(key[0])
-        # _globals._kernel.krnTrace(f'Key code: {key_code}')
-        # char = ''
+    def krnKbdDispatchKeyPress(self, key_code):
+        # The direct key code from the keyboard, shifted does not need to
+        # be handled as curses handles this for us.
 
-        # # check if the given character is valid...
-       
-        # if (key_code >= 65 and key_code <= 90 or   # A..Z 
-        # key_code >= 97 and key_code <= 123):       # a..z
-        #     # if is_shifted:
-        #     char = chr(key_code)
-        #     _globals._console.write(char)
+        
+        if ((key_code >= 65 and key_code <= 90) # A..Z
+            or (key_code >= 97 and key_code <= 123)): # a..z
+            _globals._kernel.krnTrace(f'Key code: {key_code}')
+            _globals._kernel_input_queue.enqueue(chr(key_code))
+
+        # There is really no reason to seperate this into two if statements
+        # other than style, there are a lot of cases to check, we cant send 
+        # through all however as there are strange characters from scrolling 
+        # and other actions that would throw us for a loop
+        elif ((key_code >= 48 and key_code <= 57) # digits
+            or key_code == 32                    # space
+            or key_code == 3                     # ctrl + C
+            or key_code == 13):                  # enter
+                _globals._kernel.krnTrace(f'Key code: {key_code}')
+                _globals._kernel_input_queue.enqueue(chr(key_code))

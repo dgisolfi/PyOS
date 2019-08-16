@@ -9,11 +9,14 @@ def main():
     _globals._kernel = Kernel()
     
     _globals._kernel.bootstrap()
-    devices = Devices()
+    _globals._devices = Devices()
 
     while True:
         time.sleep(_globals._CPU_CLOCK_INTERVAL)
-        devices.hostClockPulse()
+        _globals._devices.hostClockPulse()
+
+        key = _globals._console.screen.getch()
+        _globals._console.onKeyPress(key)
     
     
 

@@ -26,6 +26,8 @@ class Globals:
         self._console = None
         self._shell = None
 
+        self._devices = None
+
         self._sarcastic_mode = False
 
         self._krn_keyboard_driver = None
