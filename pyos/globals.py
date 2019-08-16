@@ -4,6 +4,7 @@ class Globals:
     def __init__(self):
         """ global constants """
         self._APP_NAME = 'PyOS'
+        self._APP_VERSION = '0.1'
         # 100 ms
         self._CPU_CLOCK_INTERVAL = 0.01
         self.TIMER_IRQ = 0
