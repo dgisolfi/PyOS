@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
-from .deviceDriver import DeviceDriver
+from pyos.os.deviceDriver import DeviceDriver
 from pyos.globals import _globals
 
 class KeyboardDriver(DeviceDriver):

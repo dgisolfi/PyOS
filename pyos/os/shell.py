@@ -2,9 +2,9 @@
 # Daniel Nicolas Gisolfi
 
 from pyos.globals import _globals
-from .commands import shell_commands
-from .userCommand import UserCommand
-from .shellCommand import ShellCommand
+from pyos.os.commands import shell_commands
+from pyos.os.userCommand import UserCommand
+from pyos.os.shellCommand import ShellCommand
 
 class Shell:
 	""" Main interaction with OS via CLI """

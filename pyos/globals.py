@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
-from .utils import Utils
+from pyos.utils import Utils
 
 class Globals:
     def __init__(self):

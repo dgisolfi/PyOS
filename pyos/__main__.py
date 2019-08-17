@@ -2,9 +2,9 @@
 # Daniel Nicolas Gisolfi
 
 from pyos.globals import _globals
-from pyos.host import Devices
-from pyos.os import Kernel
-from pyos.host import CPU
+from pyos.host.devices import Devices
+from pyos.os.kernel import Kernel
+from pyos.host.cpu import CPU
 import time
 
 def main():

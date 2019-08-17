@@ -2,7 +2,7 @@
 # Daniel Nicolas Gisolfi
 
 from pyos.globals import _globals
-from .interrupt import Interrupt
+from pyos.os.interrupt import Interrupt
 import curses
 
 class Console:

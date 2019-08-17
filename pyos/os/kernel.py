@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
-from .keyboardDriver import KeyboardDriver
+from pyos.os.keyboardDriver import KeyboardDriver
 from pyos.globals import _globals
-from .console import Console
-from .queue import Queue
-from .shell import Shell
+from pyos.os.console import Console
+from pyos.os.queue import Queue
+from pyos.os.shell import Shell
 import logging
 import sys
 
@@ -13,7 +13,9 @@ import sys
 class Kernel:
     """ OS Startup and Shutdown Routines """
     def __init__(self):
+        self.handler = None
         self.logger = self.configLogger()
+       
 
     def configLogger(self):
         """Creates and Configures a python Logger for the OS
@@ -26,9 +28,9 @@ class Kernel:
         """
         logger = logging.getLogger('pyos')
         logger.setLevel(logging.INFO)
-        fh = logging.FileHandler('pyos.log')
-        fh.setLevel(logging.INFO)
-        logger.addHandler(fh)
+        self.handler = logging.FileHandler('pyos.log')
+        self.handler.setLevel(logging.INFO)
+        logger.addHandler(self.handler)
         return logger
 
     def bootstrap(self):
@@ -81,6 +83,7 @@ class Kernel:
         # More?
         #
         self.krnTrace('End shutdown OS');
+        self.handler.close()
         sys.exit(exit_code)
     
     """ Interrupt Handling """
@@ -105,7 +108,7 @@ class Kernel:
             details to add to log 
         """
         if _globals._trace:
-            self.logger.info(msg)
+            self.logger.log(logging.INFO, msg)
 
     def krnTimerISR(self):
         """The built-in TIMER (not clock) Interrupt Service Routine 
@@ -119,6 +122,7 @@ class Kernel:
         """Checks the interrupt queue and handles any found before 
         cycling the CPU again. Otherwise logs 'idle' to the log
         """
+
         if _globals._kernel_interrupt_queue.length() > 0:
             interrupt = _globals._kernel_interrupt_queue.dequeue()
             self.krnInterruptHandler(interrupt.irq, interrupt.params)

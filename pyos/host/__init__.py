@@ -1,2 +1,2 @@
-from .devices import Devices
-from .cpu import CPU
+from pyos.host.devices import Devices
+from pyos.host.cpu import CPU
