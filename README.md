@@ -1,4 +1,4 @@
-# PyOS [![Py-OS version](https://img.shields.io/pypi/v/Py-OS.svg)](https://pypi.org/project/Py-OS)
+# PyOS [![Py-OS version](https://img.shields.io/pypi/v/Py-OS)](https://pypi.org/project/Py-OS)
 An OS that runs a subset of the 6502 opcodes, implemented in python. 
 
 ## About
@@ -22,7 +22,7 @@ To run the OS run, `python3 -m PyOS`
 
 ## Releases
 
-[1.0.0](https://github.com/dgisolfi/PyOS/tree/BaseOS) - Base OS
+[1.0.0](https://github.com/dgisolfi/PyOS/releases/tag/1.0.0) - Base OS
 
 ## Developing
 
