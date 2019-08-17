@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# 2019-8-6
+# Daniel Nicolas Gisolfi
 
 # A Python implementetation of a 
 # Queue using an array

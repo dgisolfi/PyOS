@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
+
 import time
 from pyos.os import Kernel
 from pyos.globals import _globals

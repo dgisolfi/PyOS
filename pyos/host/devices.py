@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
+
 from pyos.globals import _globals
 
 class Devices:

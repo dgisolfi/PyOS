@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
 
 from .shellCommand import ShellCommand
 from .userCommand import UserCommand

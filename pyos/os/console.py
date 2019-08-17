@@ -1,8 +1,16 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
+
 import curses
 from .interrupt import Interrupt
 from pyos.globals import _globals
 
 class Console:
+	""" The GUI of the OS 
+	
+	Configures and hides all interactions with the python curses lib
+	"""
+	
 	def __init__(self, *args, **kwargs):
 		self.x_position = 0
 		self.y_position = 0
@@ -15,6 +23,7 @@ class Console:
 		self.screen = self._setup()
 			
 	def _setup(self):
+		""" Preforms needed setup returns a new curses window instance """
 		# reset x and y pos
 		self.resetXY()
 		# create the screen
@@ -39,23 +48,40 @@ class Console:
 		return screen
 
 	def clear(self):
+		""" Wraps the clear method of the curses window """
 		self.screen.clear()
 
 	def resetXY(self):
+		""" It does exactly what you think it does... """
 		self.x_position = 0
 		self.y_position = 0
 	
-	def onKeyPress(self, key):
+	def onKeyPress(self, key: int):
+		"""Queues a new Interrupt for each key press
+
+		Attributes
+        ----------
+		key : int
+			Unicode code point
+		"""
 		_globals._kernel_interrupt_queue.enqueue(
 			Interrupt(_globals.KEYBOARD_IRQ, key)
 		)
 	
 	def newLine(self):
+		""" Advances the console by 1 line, handles all bound checking """
 		self.x_position = 0
 		self.y_position += self.checkBounds('y')
 		
 	
-	def write(self, string):
+	def write(self, string:str):
+		"""Writes given string to the console
+
+		Attributes
+        ----------
+		string : str
+			string or char to be written to screen
+		"""
 		if string is '':
 			return
 		if len(string) == 1:
@@ -67,7 +93,23 @@ class Console:
 				self.screen.addch(self.y_position, self.x_position, char)
 		self.screen.refresh()
 	
-	def checkBounds(self, dim):
+	def checkBounds(self, dim:str) -> int:
+		"""Preforms bounds checking for curses window
+
+		Attributes
+        ----------
+		dim : str
+			either the x or y dimension, pass 'x' or 'y' to preform check
+
+		Raises
+		------
+		Dimension: not valid
+			The given string does not match either dimension
+		Returns
+		-------
+		int
+			number to increment the dim by to stay within bounds
+		"""
 		if dim.lower() == 'x':
 			if (self.x_position+1) == self.width:
 				self.y_position += self.checkBounds('y')
@@ -86,6 +128,10 @@ class Console:
 
 
 	def handleInput(self):
+		"""Handles the kernel input queue
+
+		Will dequeue characters one at a time and deal with them accordingly.
+		"""
 		while (_globals._kernel_input_queue.length() > 0):
 			# Get the next character from the kernel input queue.
 			char = _globals._kernel_input_queue.dequeue()

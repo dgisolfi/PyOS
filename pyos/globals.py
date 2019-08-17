@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
+
 from .utils import Utils
 
 class Globals:

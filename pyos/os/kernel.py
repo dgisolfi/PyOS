@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
+
 from .keyboardDriver import KeyboardDriver
 from pyos.globals import _globals
 from .console import Console
