@@ -32,7 +32,7 @@ class Shell:
 		"""Called by console when the Enter key is pressed
 
 		Attributes
-        ----------
+		----------
 		buffer : str
 			All keyboard inputs in order added by the Keyboard Driver
 		"""
@@ -58,19 +58,28 @@ class Shell:
 		if found:
 			self.execute(fn, args)
 		else:
-			# TODO: implement curse checking...
-			self.execute('self.invalidCommand')
+			# It's not found, so check for curses and 
+			# apologies before declaring the command invalid.
+
+			# Check for curses.
+			if self.curses.find(f'[{_globals._utils.rot13(cmd)}]') != -1:
+				self.execute('self.curse')
+			# Check for apologies.
+			elif self.apologies.find(f'[{cmd}]') != -1:
+				self.execute('self.apology')
+			else:
+				self.execute('self.invalidCommand')
 
 	def parseInput(self, buffer) -> UserCommand:
 		"""Seperates the shell buffer into a command and its args
 
 		Attributes
-        ----------
+		----------
 		buffer : str
 			All keyboard inputs in order added by the Keyboard Driver
 		
 		Returns
-        -------
+		-------
 		object : UserCommand
 			holds all parsed arguments and the command itself
 		"""
@@ -93,7 +102,7 @@ class Shell:
 		"""Given a string evaluates that string as a function call
 
 		Attributes
-        ----------
+		----------
 		fn : str
 			the full name of a function to be called, EX: 'self.help'
 		args : list
@@ -103,6 +112,7 @@ class Shell:
 		_globals._console.newLine()
 		# call the function passed and send its args along as well
 		eval(f'{fn}({args})')
+
 		if (_globals._console.x_position > 0):
 			_globals._console.newLine()
 		self.prompt()
@@ -116,16 +126,38 @@ class Shell:
 		All attributes should be placed in the args list
 		"""
 		_globals._console.write('Invalid Command. ')
-		# TODO: Implement sarcasm mode
-		_globals._console.write('Type \'help\' for, well... help.')
+		if _globals._sarcastic_mode:
+			_globals._console.write('Unbelievable. You, [subject name here],')
+			_globals._console.newLine()
+			_globals._console.write(
+				'must be the pride of [subject hometown here].'
+			)
+		else:
+			_globals._console.write('Type \'help\' for, well... help.')
 
-	# TODO: as a part of sarcastic mode....
-	def shellCurse():
-		pass
+	def curse(self, args:list):
+		""" Reacts appropriately when shots have been fired """
+		_globals._console.write(
+			'Oh, so that\'s how it\'s going to be, eh? Fine.'
+		)
+		_globals._console.newLine()
+		_globals._console.write('Bitch.')
+		_globals._sarcastic_mode = True
 
-	def shellApology():
-		pass
-
+	def apology(self, args:list):
+		""" handles apologies from user"""
+		if _globals._sarcastic_mode:
+			_globals._console.write(
+				'I think we can put our differences behind us.'
+			)
+			_globals._console.newLine()
+			_globals._console.write(
+				'For science . . . You monster.'
+			)
+			_globals._sarcastic_mode = False
+		else:
+			_globals._console.write('For what?')
+			
 	def version(self, args:list):
 		"""Displays the app name and version number to the user
 
@@ -168,7 +200,7 @@ class Shell:
 		All attributes should be placed in the args list
 
 		Attributes
-        ----------
+		----------
 		topic : str
 			the name of the command that the manuel should be shown for
 		"""
@@ -195,7 +227,7 @@ class Shell:
 		All attributes should be placed in the args list
 
 		Attributes
-        ----------
+		----------
 		setting : str
 			either 'on' or 'off'
 		"""
@@ -221,7 +253,7 @@ class Shell:
 		"""Calls the rot13 utility for the user on specified text
 
 		Attributes
-        ----------
+		----------
 		string : str
 			the string to be rearanged
 		"""
@@ -240,7 +272,7 @@ class Shell:
 		All attributes should be placed in the args list
 
 		Attributes
-        ----------
+		----------
 		prompt : str
 			the new set of chars to set the prompt to
 		"""
