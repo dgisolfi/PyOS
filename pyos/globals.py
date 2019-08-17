@@ -38,7 +38,5 @@ class Globals:
         self._hardware_clock_id = object
         
         self._utils = Utils()
-        
-
 
 _globals = Globals()

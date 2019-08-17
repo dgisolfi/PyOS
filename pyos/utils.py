@@ -2,7 +2,22 @@
 # Daniel Nicolas Gisolfi
 
 class Utils:
+    """ This class holds all external utilities that 
+    doent nessecarily belong in the OS
+    """
     def rot13(self, string:str) -> str:
+        """A simple implementation of the ROT13 cipher
+
+        Attributes
+        ----------
+        string : str
+            the string to be shifted
+
+        Returns
+        -------
+        shifted : str
+            the shifted result of the cipher
+        """
         shifted = ''
         for char in string:
             # Convert to number with ord.

@@ -4,6 +4,7 @@
 from pyos.globals import _globals
 
 class Devices:
+    """ The controller for all loaded devices """
     def __init__(self):
         _globals._hardware_clock_id = -1
 

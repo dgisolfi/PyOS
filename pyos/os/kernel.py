@@ -81,7 +81,7 @@ class Kernel:
         # More?
         #
         self.krnTrace('End shutdown OS');
-        sys.exit(status)
+        sys.exit(exit_code)
     
     """ Interrupt Handling """
     def krnEnableInterrupts(self):
