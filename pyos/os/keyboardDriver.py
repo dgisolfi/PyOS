@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
+
 from .deviceDriver import DeviceDriver
 from pyos.globals import _globals
 
 class KeyboardDriver(DeviceDriver):
+    """ Handles all direct keyboard interactions """
     def __init__(self):
+        # overide parent class attributes
         self.driver_entry = self.krnKbdDriverEntry
         self.isr = self.krnKbdDispatchKeyPress
 
@@ -13,6 +18,13 @@ class KeyboardDriver(DeviceDriver):
         # More?
 
     def krnKbdDispatchKeyPress(self, key_code):
+        """Preforms logic on all incoming key presses for each key
+
+        Attributes
+        ----------
+        key_code : int
+            code of key pressed on keyboard
+        """
         # The direct key code from the keyboard, shifted does not need to
         # be handled as curses handles this for us.
 
@@ -32,3 +44,4 @@ class KeyboardDriver(DeviceDriver):
             or key_code == 13):                  # enter
                 _globals._kernel.krnTrace(f'Key code: {key_code}')
                 _globals._kernel_input_queue.enqueue(chr(key_code))
+                

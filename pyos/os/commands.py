@@ -1,6 +1,18 @@
+#!/usr/bin/env python3
+# Daniel Nicolas Gisolfi
 
+"""Add to this array to when new shell commands are added
+
+Each new command takes the form of an array with 3 elements
+
+element 0 -> exact name of method to be called in the shell class
+
+element 1 -> the command the user types in   
+
+element 2 -> Short Description of what it does
+
+"""
 shell_commands = [
-    # Func Name CMD   Short Description
     ['self.version', 'ver', '- Displays the current version data.'],
     ['self.help', 'help', '- This is the help command. Seek help.'],
     ['self.shutdown', 'shutdown', '- Shuts down the virtual OS but '
