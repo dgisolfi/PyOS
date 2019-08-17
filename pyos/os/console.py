@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
-import curses
-from .interrupt import Interrupt
 from pyos.globals import _globals
+from .interrupt import Interrupt
+import curses
 
 class Console:
 	""" The GUI of the OS 
