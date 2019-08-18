@@ -21,5 +21,7 @@ shell_commands = [
     ['self.man', 'man', '<topic> - Displays the MANual page for <topic>.'],
     ['self.trace', 'trace', '<on | off> - Turns the OS trace on or off.'],
     ['self.rot13', 'rot13', '<string> - Does rot13 obfuscation on <string>.'],
-    ['self.setPrompt', 'prompt', '<string> - Sets the prompt.']
+    ['self.setPrompt', 'prompt', '<string> - Sets the prompt.'],
+    ['self.datetime', 'date', '- displays the current date and time.'],
+    ['self.whereAmI', 'whereami', '- displays the users current location.']
 ]

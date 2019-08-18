@@ -16,7 +16,6 @@ class Shell:
 		self.loadCmds()
 		self.prompt()
 	
-
 	def loadCmds(self):
 		""" Load the command list. """
 		for cmd in shell_commands:
@@ -281,4 +280,10 @@ class Shell:
 		else:
 			_globals._console.write(
 				'Usage: prompt <string>  Please supply a string.'
-			)
+		)
+
+	def datetime(self, args:list):
+		pass
+
+	def whereAmI(self):
+		pass
