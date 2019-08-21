@@ -16,7 +16,7 @@ class Console:
 		self.x_position = 0
 		self.y_position = 0
 		self.buffer = ''
-		self.cmd_history = []
+		self.cmd_history = ['']
 		self.cmd_suggestions = []
 		self.cmd_index = 0
 		self.curses = curses
@@ -57,11 +57,11 @@ class Console:
 		""" It does exactly what you think it does... """
 		self.x_position = 0
 		self.y_position = 0
-	
+
 	def onKeyPress(self, key: int):
 		"""Queues a new Interrupt for each key press
 
-		Attributes
+		Parameters
 		----------
 		key : int
 			Unicode code point
@@ -77,14 +77,14 @@ class Console:
 		
 	def clearLine(self):
 		self.buffer = ''
-		while self.x_position >= 2:
+		while self.x_position > 2:
 			self.screen.delch(self.y_position, self.x_position)
 			self.x_position -= 1
 
 	def write(self, string:str):
 		"""Writes given string to the console
 
-		Attributes
+		Parameters
 		----------
 		string : str
 			string or char to be written to screen
@@ -103,7 +103,7 @@ class Console:
 	def checkBounds(self, dim:str) -> int:
 		"""Preforms bounds checking for curses window
 
-		Attributes
+		Parameters
 		----------
 		dim : str
 			either the x or y dimension, pass 'x' or 'y' to preform check
@@ -148,11 +148,13 @@ class Console:
 				# The enter key marks the end of a console command, so ... 
 				# ... tell the shell ...
 				self.write(char)
-				_globals._shell.handleInput(self.buffer);
 				# Add to the command history
-				self.cmd_history.append(self.buffer)
-				self.cmd_index = len(self.cmd_history)
-				self.write(f'{self.cmd_index} | {self.cmd_history}')
+				self.cmd_history[-1] = self.buffer
+				# adds empty string so the user can go back to typing without deleting cmd
+				self.cmd_history.append('')
+				self.cmd_index = len(self.cmd_history)-1
+				
+				_globals._shell.handleInput(self.buffer);
 				# ... and reset our buffer.
 				self.buffer = ''
 			elif char == chr(127) or char == chr(8): # Delete Key
@@ -174,13 +176,13 @@ class Console:
 					rest_of_cmd = suggestion[-remaining_len:]
 					self.write(rest_of_cmd)
 					self.buffer += rest_of_cmd
-			elif char == chr(258): # up
+			elif char == chr(259): # up
 				cmd = self.cmdHistory('up')
 				if cmd is not None:
 					self.buffer = cmd
 					self.x_position = 2
 					self.write(self.buffer)
-			elif char == chr(259): # down
+			elif char == chr(258): # down
 				cmd = self.cmdHistory('down')
 				if cmd is not None:
 					self.buffer = cmd
@@ -198,7 +200,7 @@ class Console:
 	def cmdCompletion(self, buffer:str) -> str:
 		"""Given the current buffer a possible command will be auto completed 
 
-		Attributes
+		Parameters
 		----------
 		buffer : str
 			the current unhandled input stream
@@ -221,22 +223,33 @@ class Console:
 			return None
 	
 	def cmdHistory(self, direction:str) -> str:
+		"""Given a direction the command history is cycled
+
+		Parameters
+		----------
+		direction : str
+			the arrow direction the user pressed
+
+		Returns
+		-------
+		cmd : str
+			the command from the history array that is next in the direction specified
 		"""
-		"""
-		self.write(str(self.cmd_index))
 		if len(self.cmd_history) is 0:
 			return None
 		else:
 			self.clearLine()
-			num_of_elements = len(self.cmd_history)-1
+			num_of_elements = len(self.cmd_history)
+
 			if direction is 'up':
+				if (self.cmd_index - 1) != -1:
+					self.cmd_index -= 1
+
+			elif direction is 'down':
 				if (self.cmd_index + 1) != num_of_elements:
 					self.cmd_index += 1
-					return self.cmd_history[self.cmd_index]
-			elif direction is 'down':
-				if num_of_elements - 1 != -1:
-					self.cmd_index -= 1
-					return self.cmd_history[self.cmd_index]
+	
+			return self.cmd_history[self.cmd_index]
 
 			
 

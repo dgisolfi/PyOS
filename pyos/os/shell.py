@@ -30,7 +30,7 @@ class Shell:
 	def handleInput(self, buffer:str):
 		"""Called by console when the Enter key is pressed
 
-		Attributes
+		Parameters
 		----------
 		buffer : str
 			All keyboard inputs in order added by the Keyboard Driver
@@ -72,7 +72,7 @@ class Shell:
 	def parseInput(self, buffer) -> UserCommand:
 		"""Seperates the shell buffer into a command and its args
 
-		Attributes
+		Parameters
 		----------
 		buffer : str
 			All keyboard inputs in order added by the Keyboard Driver
@@ -100,7 +100,7 @@ class Shell:
 	def execute(self, fn:str, args=[]):
 		"""Given a string evaluates that string as a function call
 
-		Attributes
+		Parameters
 		----------
 		fn : str
 			the full name of a function to be called, EX: 'self.help'
@@ -122,7 +122,7 @@ class Shell:
 		"""Alerts the user that the command entered does 
 		not match any command loaded
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write('Invalid Command. ')
 		if _globals._sarcastic_mode:
@@ -160,7 +160,7 @@ class Shell:
 	def version(self, args:list):
 		"""Displays the app name and version number to the user
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write(
 			f'{_globals._APP_NAME} v{_globals._APP_VERSION}'
@@ -169,7 +169,7 @@ class Shell:
 	def help(self, args:list):
 		"""Displays full list of commands and descriptions to user
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write('Commands:')
 		for cmd in self.command_list:
@@ -179,7 +179,7 @@ class Shell:
 	def shutdown(self, args:list):
 		"""Preforms controlled system shutdown
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write('Shutting down...')
 		# call kernal routine, pass in 0 as status, this is a normal shutdown
@@ -188,7 +188,7 @@ class Shell:
 	def cls(self, args:list):
 		"""Clears the console window
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.clear()
 		_globals._console.resetXY()
@@ -196,9 +196,9 @@ class Shell:
 	def man(self, args:list):
 		"""Displays the manuel for a given command
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 
-		Attributes
+		Parameters
 		----------
 		topic : str
 			the name of the command that the manuel should be shown for
@@ -223,9 +223,9 @@ class Shell:
 	def trace(self, args:list):
 		"""Sets the boolean for kernel tracing
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 
-		Attributes
+		Parameters
 		----------
 		setting : str
 			either 'on' or 'off'
@@ -251,7 +251,7 @@ class Shell:
 	def rot13(self, args:list):
 		"""Calls the rot13 utility for the user on specified text
 
-		Attributes
+		Parameters
 		----------
 		string : str
 			the string to be rearanged
@@ -268,9 +268,9 @@ class Shell:
 	def setPrompt(self, args:list):
 		"""Sets the prompt of the shell to a user specified string
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 
-		Attributes
+		Parameters
 		----------
 		prompt : str
 			the new set of chars to set the prompt to

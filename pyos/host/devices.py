@@ -14,7 +14,7 @@ class Devices:
         # Call the kernel clock pulse event handler.
         _globals._kernel.krnOnCPUClockPulse()
     
-    """ Curses attributes to control host input """
+    """ Curses Parameters to control host input """
     def hostEnableKeyboardInterrupt(self):
         _globals._console.screen.keypad(True)
 

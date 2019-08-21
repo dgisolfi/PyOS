@@ -7,7 +7,7 @@ from pyos.globals import _globals
 class KeyboardDriver(DeviceDriver):
     """ Handles all direct keyboard interactions """
     def __init__(self):
-        # overide parent class attributes
+        # overide parent class Parameters
         self.driver_entry = self.krnKbdDriverEntry
         self.isr = self.krnKbdDispatchKeyPress
 
@@ -20,7 +20,7 @@ class KeyboardDriver(DeviceDriver):
     def krnKbdDispatchKeyPress(self, key_code):
         """Preforms logic on all incoming key presses for each key
 
-        Attributes
+        Parameters
         ----------
         key_code : int
             code of key pressed on keyboard
@@ -55,6 +55,3 @@ class KeyboardDriver(DeviceDriver):
             or key_code >= 123 and key_code <= 126):
             _globals._kernel.krnTrace(f'Key code: {key_code}')
             _globals._kernel_input_queue.enqueue(chr(key_code))
-
-        else:
-            _globals._console.write(str(key_code))
