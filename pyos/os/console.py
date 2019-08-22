@@ -147,7 +147,6 @@ class Console:
 			if char == chr(13): # Enter key
 				# The enter key marks the end of a console command, so ... 
 				# ... tell the shell ...
-				self.write(char)
 				# Add to the command history
 				self.cmd_history[-1] = self.buffer
 				# adds empty string so the user can go back to typing without deleting cmd

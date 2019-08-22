@@ -5,6 +5,9 @@ from pyos.globals import _globals
 from pyos.os.commands import shell_commands
 from pyos.os.userCommand import UserCommand
 from pyos.os.shellCommand import ShellCommand
+import datetime
+import os
+import re
 
 class Shell:
 	""" Main interaction with OS via CLI """
@@ -13,6 +16,7 @@ class Shell:
 		self.command_list = []
 		self.curses = '[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]'
 		self.apologies = '[sorry]'
+		self.user_status = '\'\''
 		self.loadCmds()
 		self.prompt()
 	
@@ -282,8 +286,59 @@ class Shell:
 				'Usage: prompt <string>  Please supply a string.'
 		)
 
-	def datetime(self, args:list):
-		pass
+	def dateTime(self, args:list):
+		""" Writes the current datetime to the shell """
+		_globals._console.write(str(datetime.datetime.now()))
 
-	def whereAmI(self):
-		pass
+	def whereAmI(self, args:list):
+		""" Prints current working directory """
+		_globals._console.write(
+			f'{os.getcwd()}'
+		)
+		
+	def status(self, args:list):
+		"""Sets current users status
+
+		All Parameters should be placed in the args list
+
+		Parameters
+		----------
+		status : str
+			the new status set by the user
+		"""
+		if len(args) > 0:
+			self.user_status = args[0]
+		else:
+			_globals._console.write(
+				f'status: {self.user_status}'
+			)
+
+	def bsod(self, args:list):
+		""" Forces a kernel shutdown"""
+		_globals._kernel.krnTrapError('Forced by user')
+	
+	def load(self, args:list) -> int:
+		"""Given hex usercode it will be validated and loaded
+
+		Parameters
+		----------
+		user_code : str
+			a string of 1 or more hex chars sperated by spaces
+		"""
+		if len(args) > 0:
+			user_code = args[0].split(' ')
+			for opcode in user_code:
+				if len(opcode) != 2:
+					_globals._console.write(f'Error: {opcode} is greater than 2 chars')
+					return 1
+				elif not re.match(r'[0-9A-Fa-f]{2}', opcode):
+					_globals._console.write(f'Error: "{opcode}" is not valid hex')
+					return 1
+		
+			_globals._console.write('Program load successful.')
+			return 0
+		else:
+			_globals._console.write(
+				'Usage: load <string> Please supply a program in hex format.'
+			)
+		
