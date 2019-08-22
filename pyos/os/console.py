@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
-from pyos.globals import _globals
+from pyos.os.commands import shell_commands
 from pyos.os.interrupt import Interrupt
+from pyos.globals import _globals
 import curses
 
 class Console:
@@ -15,8 +16,9 @@ class Console:
 		self.x_position = 0
 		self.y_position = 0
 		self.buffer = ''
-		self.cmd_history = []
-		self.cmd_index = []
+		self.cmd_history = ['']
+		self.cmd_suggestions = []
+		self.cmd_index = 0
 		self.curses = curses
 		self.height = int
 		self.width = int
@@ -55,12 +57,12 @@ class Console:
 		""" It does exactly what you think it does... """
 		self.x_position = 0
 		self.y_position = 0
-	
+
 	def onKeyPress(self, key: int):
 		"""Queues a new Interrupt for each key press
 
-		Attributes
-        ----------
+		Parameters
+		----------
 		key : int
 			Unicode code point
 		"""
@@ -73,12 +75,17 @@ class Console:
 		self.x_position = 0
 		self.y_position += self.checkBounds('y')
 		
-	
+	def clearLine(self):
+		self.buffer = ''
+		while self.x_position > 2:
+			self.screen.delch(self.y_position, self.x_position)
+			self.x_position -= 1
+
 	def write(self, string:str):
 		"""Writes given string to the console
 
-		Attributes
-        ----------
+		Parameters
+		----------
 		string : str
 			string or char to be written to screen
 		"""
@@ -96,8 +103,8 @@ class Console:
 	def checkBounds(self, dim:str) -> int:
 		"""Preforms bounds checking for curses window
 
-		Attributes
-        ----------
+		Parameters
+		----------
 		dim : str
 			either the x or y dimension, pass 'x' or 'y' to preform check
 
@@ -135,14 +142,51 @@ class Console:
 		while (_globals._kernel_input_queue.length() > 0):
 			# Get the next character from the kernel input queue.
 			char = _globals._kernel_input_queue.dequeue()
-			# Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
+			# Check to see if it's "special" (enter or ctrl-c) or 
+			# "normal" (anything else that the keyboard device driver gave us).
 			if char == chr(13): # Enter key
 				# The enter key marks the end of a console command, so ... 
 				# ... tell the shell ...
-				self.write(char)
+				# Add to the command history
+				self.cmd_history[-1] = self.buffer
+				# adds empty string so the user can go back to typing without deleting cmd
+				self.cmd_history.append('')
+				self.cmd_index = len(self.cmd_history)-1
+				
 				_globals._shell.handleInput(self.buffer);
 				# ... and reset our buffer.
 				self.buffer = ''
+			elif char == chr(127) or char == chr(8): # Delete Key
+				# the prompt is at pos 1 and the space is at 2 
+				# lines start at pos 3
+				if self.x_position > 2:
+					# this is why python is the best...no long gros syntax
+					# just simple string slicing using square brackets
+					# For reference the following is the way i did the same thing in TS
+					# var lastChar = this.buffer.charAt(this.buffer.length - 1);
+                    # this.buffer = this.buffer.substring(0, this.buffer.length - 1);
+					self.buffer = self.buffer[:-1]
+					self.screen.delch(self.y_position, self.x_position)
+					self.x_position -= 1
+			elif char == chr(9): # tab
+				suggestion = self.cmdCompletion(self.buffer)
+				if suggestion is not None:
+					remaining_len = len(suggestion) - len(self.buffer)
+					rest_of_cmd = suggestion[-remaining_len:]
+					self.write(rest_of_cmd)
+					self.buffer += rest_of_cmd
+			elif char == chr(259): # up
+				cmd = self.cmdHistory('up')
+				if cmd is not None:
+					self.buffer = cmd
+					self.x_position = 2
+					self.write(self.buffer)
+			elif char == chr(258): # down
+				cmd = self.cmdHistory('down')
+				if cmd is not None:
+					self.buffer = cmd
+					self.x_position = 2
+					self.write(self.buffer)
 			elif char == chr(3): # Ctrl-C
 				_globals._kernel.krnShutdown(0)
 			else:
@@ -151,3 +195,60 @@ class Console:
 				self.write(char)
 				# ... and add it to our buffer.
 				self.buffer += char;
+
+	def cmdCompletion(self, buffer:str) -> str:
+		"""Given the current buffer a possible command will be auto completed 
+
+		Parameters
+		----------
+		buffer : str
+			the current unhandled input stream
+
+		Returns
+		-------
+		suggestion : str
+			A predictions as to what the command the user may be typing
+		"""
+		# the length of the longest match(s) found
+		char_match_len = 0
+		for cmd in shell_commands:
+			if cmd[1].startswith(buffer):
+				if cmd[1] not in self.cmd_suggestions:
+					self.cmd_suggestions.append(cmd[1])
+		
+		if len(self.cmd_suggestions) == 1:
+			return self.cmd_suggestions[0]
+		else:
+			return None
+	
+	def cmdHistory(self, direction:str) -> str:
+		"""Given a direction the command history is cycled
+
+		Parameters
+		----------
+		direction : str
+			the arrow direction the user pressed
+
+		Returns
+		-------
+		cmd : str
+			the command from the history array that is next in the direction specified
+		"""
+		if len(self.cmd_history) is 0:
+			return None
+		else:
+			self.clearLine()
+			num_of_elements = len(self.cmd_history)
+
+			if direction is 'up':
+				if (self.cmd_index - 1) != -1:
+					self.cmd_index -= 1
+
+			elif direction is 'down':
+				if (self.cmd_index + 1) != num_of_elements:
+					self.cmd_index += 1
+	
+			return self.cmd_history[self.cmd_index]
+
+			
+

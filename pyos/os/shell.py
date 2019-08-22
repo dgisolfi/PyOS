@@ -5,6 +5,9 @@ from pyos.globals import _globals
 from pyos.os.commands import shell_commands
 from pyos.os.userCommand import UserCommand
 from pyos.os.shellCommand import ShellCommand
+import datetime
+import os
+import re
 
 class Shell:
 	""" Main interaction with OS via CLI """
@@ -13,10 +16,10 @@ class Shell:
 		self.command_list = []
 		self.curses = '[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]'
 		self.apologies = '[sorry]'
+		self.user_status = '\'\''
 		self.loadCmds()
 		self.prompt()
 	
-
 	def loadCmds(self):
 		""" Load the command list. """
 		for cmd in shell_commands:
@@ -31,7 +34,7 @@ class Shell:
 	def handleInput(self, buffer:str):
 		"""Called by console when the Enter key is pressed
 
-		Attributes
+		Parameters
 		----------
 		buffer : str
 			All keyboard inputs in order added by the Keyboard Driver
@@ -73,7 +76,7 @@ class Shell:
 	def parseInput(self, buffer) -> UserCommand:
 		"""Seperates the shell buffer into a command and its args
 
-		Attributes
+		Parameters
 		----------
 		buffer : str
 			All keyboard inputs in order added by the Keyboard Driver
@@ -101,7 +104,7 @@ class Shell:
 	def execute(self, fn:str, args=[]):
 		"""Given a string evaluates that string as a function call
 
-		Attributes
+		Parameters
 		----------
 		fn : str
 			the full name of a function to be called, EX: 'self.help'
@@ -123,7 +126,7 @@ class Shell:
 		"""Alerts the user that the command entered does 
 		not match any command loaded
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write('Invalid Command. ')
 		if _globals._sarcastic_mode:
@@ -161,7 +164,7 @@ class Shell:
 	def version(self, args:list):
 		"""Displays the app name and version number to the user
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write(
 			f'{_globals._APP_NAME} v{_globals._APP_VERSION}'
@@ -170,7 +173,7 @@ class Shell:
 	def help(self, args:list):
 		"""Displays full list of commands and descriptions to user
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write('Commands:')
 		for cmd in self.command_list:
@@ -180,7 +183,7 @@ class Shell:
 	def shutdown(self, args:list):
 		"""Preforms controlled system shutdown
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.write('Shutting down...')
 		# call kernal routine, pass in 0 as status, this is a normal shutdown
@@ -189,7 +192,7 @@ class Shell:
 	def cls(self, args:list):
 		"""Clears the console window
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 		"""
 		_globals._console.clear()
 		_globals._console.resetXY()
@@ -197,9 +200,9 @@ class Shell:
 	def man(self, args:list):
 		"""Displays the manuel for a given command
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 
-		Attributes
+		Parameters
 		----------
 		topic : str
 			the name of the command that the manuel should be shown for
@@ -224,9 +227,9 @@ class Shell:
 	def trace(self, args:list):
 		"""Sets the boolean for kernel tracing
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 
-		Attributes
+		Parameters
 		----------
 		setting : str
 			either 'on' or 'off'
@@ -252,7 +255,7 @@ class Shell:
 	def rot13(self, args:list):
 		"""Calls the rot13 utility for the user on specified text
 
-		Attributes
+		Parameters
 		----------
 		string : str
 			the string to be rearanged
@@ -269,9 +272,9 @@ class Shell:
 	def setPrompt(self, args:list):
 		"""Sets the prompt of the shell to a user specified string
 
-		All attributes should be placed in the args list
+		All Parameters should be placed in the args list
 
-		Attributes
+		Parameters
 		----------
 		prompt : str
 			the new set of chars to set the prompt to
@@ -281,4 +284,61 @@ class Shell:
 		else:
 			_globals._console.write(
 				'Usage: prompt <string>  Please supply a string.'
+		)
+
+	def dateTime(self, args:list):
+		""" Writes the current datetime to the shell """
+		_globals._console.write(str(datetime.datetime.now()))
+
+	def whereAmI(self, args:list):
+		""" Prints current working directory """
+		_globals._console.write(
+			f'{os.getcwd()}'
+		)
+		
+	def status(self, args:list):
+		"""Sets current users status
+
+		All Parameters should be placed in the args list
+
+		Parameters
+		----------
+		status : str
+			the new status set by the user
+		"""
+		if len(args) > 0:
+			self.user_status = args[0]
+		else:
+			_globals._console.write(
+				f'status: {self.user_status}'
 			)
+
+	def bsod(self, args:list):
+		""" Forces a kernel shutdown"""
+		_globals._kernel.krnTrapError('Forced by user')
+	
+	def load(self, args:list) -> int:
+		"""Given hex usercode it will be validated and loaded
+
+		Parameters
+		----------
+		user_code : str
+			a string of 1 or more hex chars sperated by spaces
+		"""
+		if len(args) > 0:
+			user_code = args[0].split(' ')
+			for opcode in user_code:
+				if len(opcode) != 2:
+					_globals._console.write(f'Error: {opcode} is greater than 2 chars')
+					return 1
+				elif not re.match(r'[0-9A-Fa-f]{2}', opcode):
+					_globals._console.write(f'Error: "{opcode}" is not valid hex')
+					return 1
+		
+			_globals._console.write('Program load successful.')
+			return 0
+		else:
+			_globals._console.write(
+				'Usage: load <string> Please supply a program in hex format.'
+			)
+		

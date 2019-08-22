@@ -67,7 +67,7 @@ class Kernel:
     def krnShutdown(self, exit_code:int):
         """Unloads drivers and preforms system shutdown
 
-        Attributes
+        Parameters
         ----------
         exit_code : int
             the exit code of the OS after shutdown; 0 if okay, 
@@ -102,7 +102,7 @@ class Kernel:
     def krnTrace(self, msg:str):
         """ Logs system level info
         
-        Attributes
+        Parameters
         ----------
         msg : str
             details to add to log 
@@ -134,7 +134,7 @@ class Kernel:
     def krnInterruptHandler(self, irq:int, params:list):
         """Invokes the requested Interrupt Service Routine
 
-        Attributes
+        Parameters
         ----------
         irq : int
             Number denoting action to be preformed

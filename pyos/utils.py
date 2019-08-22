@@ -8,7 +8,7 @@ class Utils:
     def rot13(self, string:str) -> str:
         """A simple implementation of the ROT13 cipher
 
-        Attributes
+        Parameters
         ----------
         string : str
             the string to be shifted
