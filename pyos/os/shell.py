@@ -5,7 +5,6 @@ from pyos.os.shellCommand import ShellCommand
 from pyos.os.commands import shell_commands
 from pyos.os.userCommand import UserCommand
 from pyos.globals import _globals
-from pyos.os.pcb import PCB
 import datetime
 import os
 import re
@@ -354,7 +353,7 @@ class Shell:
 			# program loaded into memory
 			if exit_code is 0:
 				# create new proccess
-				pid = _globals.PCM.create(base, limit, 0, local)
+				pid = _globals.PCM.create(base, limit)
 				_globals._console.write(f'Program load successful;  <pid> {pid} created')
 				return 0
 			# memory is full, load onto disk
