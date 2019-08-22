@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
+from pyos.host.memoryAccessor import MemoryAccessor
 from pyos.os.keyboardDriver import KeyboardDriver
-from pyos.globals import _globals
+from pyos.os.memoryManager import MemoryManager
+from pyos.host.memory import Memory
 from pyos.os.console import Console
+from pyos.globals import _globals
 from pyos.os.queue import Queue
 from pyos.os.shell import Shell
+from sys import exit
 import logging
-import sys
-
 
 class Kernel:
     """ OS Startup and Shutdown Routines """
@@ -42,6 +44,13 @@ class Kernel:
         _globals._kernel_buffers = []
         # Device Input to be proccessed
         _globals._kernel_input_queue = Queue()
+
+        # init memory and its accessor
+        _globals._mem = Memory()
+        _globals._memory_manager = MemoryManager()
+
+        _globals._memory_accessor = MemoryAccessor()
+
 
         # Init Console
         _globals._console = Console()
@@ -84,7 +93,7 @@ class Kernel:
         #
         self.krnTrace('End shutdown OS');
         self.handler.close()
-        sys.exit(exit_code)
+        exit(exit_code)
     
     """ Interrupt Handling """
     def krnEnableInterrupts(self):

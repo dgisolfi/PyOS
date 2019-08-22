@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # Daniel Nicolas Gisolfi
 
-from pyos.globals import _globals
+from pyos.os.shellCommand import ShellCommand
 from pyos.os.commands import shell_commands
 from pyos.os.userCommand import UserCommand
-from pyos.os.shellCommand import ShellCommand
+from pyos.globals import _globals
+from pyos.os.pcb import PCB
 import datetime
 import os
 import re
@@ -326,17 +327,41 @@ class Shell:
 			a string of 1 or more hex chars sperated by spaces
 		"""
 		if len(args) > 0:
-			user_code = args[0].split(' ')
+			user_code = args
+						
+			if len(user_code) > 256:
+				_globals._console.write(
+					f'Error: Program to Large, program is {len(user_code)}'
+					+' bytes. Max is 256 per program.'
+					)
+				return 1    
+
 			for opcode in user_code:
 				if len(opcode) != 2:
-					_globals._console.write(f'Error: {opcode} is greater than 2 chars')
+					_globals._console.write(f'Error: {opcode} is not 2 chars')
 					return 1
 				elif not re.match(r'[0-9A-Fa-f]{2}', opcode):
-					_globals._console.write(f'Error: "{opcode}" is not valid hex')
+					_globals._console.write(
+						f'Error: "{opcode}" is not valid hex'
+					)
 					return 1
-		
-			_globals._console.write('Program load successful.')
-			return 0
+			
+		   	# load the program into memory (and disk eventually)
+			exit_code, base, limit, local = _globals._memory_manager.loadInMem(
+				user_code
+			)
+
+			# program loaded into memory
+			if exit_code is 0:
+				# create new proccess
+				pid = _globals.PCM.create(base, limit, 0, local)
+				_globals._console.write(f'Program load successful;  <pid> {pid} created')
+				return 0
+			# memory is full, load onto disk
+			elif exit_code is 1:
+				_globals._console.write('Program not loaded, Memory Full!')
+				return 1
+			
 		else:
 			_globals._console.write(
 				'Usage: load <string> Please supply a program in hex format.'

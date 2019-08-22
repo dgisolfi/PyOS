@@ -32,6 +32,10 @@ class Globals:
 
         self._devices = object
 
+        self._mem = object
+        self._memory_manager = object
+        self._memory_accessor = object
+
         self._sarcastic_mode = False
 
         self._krn_keyboard_driver = object
