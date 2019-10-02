@@ -350,10 +350,11 @@ class Shell:
 				user_code
 			)
 
+			_globals._kernel.krnTrace(_globals._mem)
 			# program loaded into memory
 			if exit_code is 0:
 				# create new proccess
-				pid = _globals.PCM.create(base, limit)
+				pid = _globals._pcm.create(base, limit)
 				_globals._console.write(f'Program load successful;  <pid> {pid} created')
 				return 0
 			# memory is full, load onto disk
@@ -366,3 +367,110 @@ class Shell:
 				'Usage: load <string> Please supply a program in hex format.'
 			)
 		
+	def run(self, args:list):
+		"""Given a PID the given process will be executed
+
+		Parameters
+		----------
+		pid : int
+			an integer that is provided when a program is loaded into memory
+		"""
+		if len(args) != 1:
+			_globals._console.write(
+				'Usage: run <pid> Please specify the PID to execute.'
+			)
+		else:
+			if not args[0].isdigit():
+				_globals._console.write(
+					f'PID: "{pid}" is invalid, must be a positive integer.'
+				)
+			else:	
+				pid = int(args[0])
+				# Check if PID is valid
+				if pid in _globals._pcm.resident_queue:
+					# load the program into the ready queue
+					_globals._pcm.ready_queue[pid] = (
+						_globals._pcm.resident_queue[pid]
+					)
+					# remove the entry from the resident queue
+					del _globals._pcm.resident_queue[pid]
+					_globals._pcm.ready_queue[pid].state = 'ready'
+
+                    # schedule
+					if not _globals._cpu.is_executing:
+						_globals._pcm.exec(pid)
+
+					_globals._console.write(
+						f'Running program with <pid> {pid}'
+					)
+
+					_globals._console.newLine()
+				# Not found, check if its queued, dead, or running
+				else:
+					if pid in _globals._pcm.ready_queue:
+						_globals._console.write(
+							f'PID: "{pid}" is already loaded and in the Ready Queue'
+						)
+					elif pid in _globals._pcm.terminated_queue:
+						_globals._console.write(
+							f'PID: "{pid}" is terminated and cannot be rerun.'
+						)
+					else:
+						_globals._console.write(
+							f'PID: "{pid}" not a valid program ID.'
+						)
+	
+	def ps(self, args:list):
+		"""Shows all running processes
+		"""
+		if (len(_globals._pcm.terminated_queue) == 0 and
+			len(_globals._pcm.resident_queue) == 0 and
+			len(_globals._pcm.ready_queue) == 0 and
+			_globals._pcm.running_process.pid == -1):
+			_globals._console.write(
+				f'There are currently no processes running, ready or resident.'
+			)
+		else:
+			processes = ['PID STATUS']
+			for pid, process in _globals._pcm.resident_queue.items():
+				processes.append(f'{process.pid}   {process.state}')
+
+			for pid, process in _globals._pcm.ready_queue.items():
+				processes.append(f'{process.pid}   {process.state}')
+			
+			for pid, process in _globals._pcm.terminated_queue.items():
+				processes.append(f'{process.pid}   {process.state}')
+				
+			if _globals._pcm.running_process.pid != -1:
+				processes.append(
+					f'{_globals._pcm.running_process.pid}   '
+					+ f'{_globals._pcm.running_process.state}'
+				)
+
+			for process in processes:
+				_globals._console.write(
+					process
+				)
+				_globals._console.newLine()
+	
+	def kill(self, args:list):
+		"""Terminates a process given a pid
+		"""
+	
+		if len(args) != 1:
+			_globals._console.write(
+				'Usage: kill <pid> Please specify the PID to terminate.'
+			)
+		else:
+			pid = args[0]
+			if not args[0].isdigit():
+				_globals._console.write(
+					f'PID: "{pid}" is invalid, must be a positive integer.'
+				)
+			else:
+				if pid in _globals._pcm.terminated_queue:
+					_globals._console.write(
+						f'Error: process {pid} already terminated`'
+					)
+				else:
+					_globals._pcm.terminate(pid)

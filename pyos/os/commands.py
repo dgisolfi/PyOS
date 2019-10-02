@@ -26,5 +26,7 @@ shell_commands = [
     ['self.whereAmI', 'whereami', '- displays the users current location.'],
     ['self.status', 'status', '<string> - sets the current user status'],
     ['self.bsod', 'bsod', '- forces kernel error and results in shutdown'],
-    ['self.load', 'load', '<string> - validates and loads a program of hex chars into memory/disk']
+    ['self.load', 'load', '<string> - validates and loads a program of hex chars into memory/disk'],
+    ['self.run', 'run', '<pid> - Given a PID the given process will be executed'],
+    ['self.ps', 'ps', '- Shows all running processes']
 ]

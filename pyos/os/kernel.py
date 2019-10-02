@@ -3,6 +3,7 @@
 
 from pyos.host.memoryAccessor import MemoryAccessor
 from pyos.os.keyboardDriver import KeyboardDriver
+from pyos.os.processManager import ProcessManager
 from pyos.os.memoryManager import MemoryManager
 from pyos.host.memory import Memory
 from pyos.os.console import Console
@@ -51,6 +52,8 @@ class Kernel:
 
         _globals._memory_accessor = MemoryAccessor()
 
+        # init the process controllers 
+        _globals._pcm = ProcessManager()
 
         # Init Console
         _globals._console = Console()
@@ -131,7 +134,6 @@ class Kernel:
         """Checks the interrupt queue and handles any found before 
         cycling the CPU again. Otherwise logs 'idle' to the log
         """
-
         if _globals._kernel_interrupt_queue.length() > 0:
             interrupt = _globals._kernel_interrupt_queue.dequeue()
             self.krnInterruptHandler(interrupt.irq, interrupt.params)
@@ -157,6 +159,8 @@ class Kernel:
         elif irq == _globals.KEYBOARD_IRQ:
             _globals._krn_keyboard_driver.isr(params)
             _globals._console.handleInput()
+        elif irq == _globals.PROCESS_EXIT:
+            _globals._pcm.terminate(params)
 
     def krnTrapError(self, msg):
         """Called when OS throws an error, calls 

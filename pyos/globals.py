@@ -12,6 +12,10 @@ class Globals:
         self._CPU_CLOCK_INTERVAL = 0.01
         self.TIMER_IRQ = 0
         self.KEYBOARD_IRQ = 1
+        self.PROCESS_EXIT = 2
+        self.PRINT_IR = 3
+        self.OUT_OF_BOUNDS = 4
+        self.CONTEXT_SWITCH = 5
 
         """ global variables """
         self._cpu = object
@@ -35,6 +39,8 @@ class Globals:
         self._mem = object
         self._memory_manager = object
         self._memory_accessor = object
+
+        self._pcm = object
 
         self._sarcastic_mode = False
 

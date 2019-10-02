@@ -30,6 +30,8 @@ class Console:
 		self.resetXY()
 		# create the screen
 		screen = curses.initscr()
+		# do not wait for input when calling getch
+		screen.nodelay(True)
 		# Use the color of the existing terminal
 		curses.start_color()
 		curses.use_default_colors()
@@ -66,9 +68,12 @@ class Console:
 		key : int
 			Unicode code point
 		"""
-		_globals._kernel_interrupt_queue.enqueue(
-			Interrupt(_globals.KEYBOARD_IRQ, key)
-		)
+		# When using the non-blocking screen mode, no key 
+		# press is denoted by a negative 1
+		if key != -1:
+			_globals._kernel_interrupt_queue.enqueue(
+				Interrupt(_globals.KEYBOARD_IRQ, key)
+			)
 	
 	def newLine(self):
 		""" Advances the console by 1 line, handles all bound checking """
@@ -249,6 +254,3 @@ class Console:
 					self.cmd_index += 1
 	
 			return self.cmd_history[self.cmd_index]
-
-			
-

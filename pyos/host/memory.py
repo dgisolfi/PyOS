@@ -12,6 +12,20 @@ class Memory:
 		self.is_seg_02_full = False
 		self._setup()
 
+	def __str__(self):
+		rows = self.split(self._memory, 8)
+		out = ''
+		cur_line = ''
+		for row in rows:
+			for hex in row:
+				cur_line += f'{hex} '
+			out += cur_line + '\n'
+			cur_line = ''
+		return out
+
+	def __repr__(self):
+		return self.__str__()
+
 	def __getitem__(self, key):
 		return self._memory[key]
 
@@ -20,7 +34,16 @@ class Memory:
 		
 	def _setup(self):
 		[ self.memory.append('00') for i in range(0,767) ]
-	
+
+	def split(self, arr, size):
+		arrs = []
+		while len(arr) > size:
+			splice = arr[:size]
+			arrs.append(splice)
+			arr = arr[size:]
+		arrs.append(arr)
+		return arrs
+
 	@property
 	def memory(self) -> list:
 		return self._memory
