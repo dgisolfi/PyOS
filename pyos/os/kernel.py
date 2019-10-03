@@ -161,6 +161,8 @@ class Kernel:
             _globals._console.handleInput()
         elif irq == _globals.PROCESS_EXIT:
             _globals._pcm.terminate(params)
+        elif irq == _globals.PRINT_IR:
+            _globals._console.write(params)
 
     def krnTrapError(self, msg):
         """Called when OS throws an error, calls 

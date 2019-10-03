@@ -26,7 +26,7 @@ class CPU:
             'EA' : self.noOP,
             '00' : self.progBreak,
             'EC' : self.xRegCompare,
-            'DO' : self.branch,
+            'D0' : self.branch,
             'EE' : self.incByte,
             'FF' : self.sysCallPrint
         }
@@ -71,11 +71,10 @@ class CPU:
             _globals._kernel_interrupt_queue.enqueue(
                 Interrupt(
                     _globals.PROCESS_EXIT, 
-                    _globals._pcm.runningprocess.pid
+                    _globals._pcm.running_process.pid
                 )
             )
         else:
-            # _globals._console.write(str(self.instruction_set[op_code.upper()]))
             self.instruction_set[op_code.upper()]()
 
     def incPC(self, num):
@@ -93,14 +92,13 @@ class CPU:
         self.acc = self.decimal(
             _globals._memory_accessor.read(self.pc+1)
         )
-        _globals._console.write(str(self.acc))
         self.incPC(2)
 
     # AD -- Load the accumulator from memory
     def loadAccMem(self):
         # Store the values at the first and second postions
         val1 = _globals._memory_accessor.read(self.pc+1)
-        val2 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
         # Switch the order because we must read/write in little endian
         addr = val2 + val1
         # Read from memory with the corected endian format 
@@ -116,7 +114,7 @@ class CPU:
     def storeAccMem(self):
         # Store the values at the first and second postions
         val1 = _globals._memory_accessor.read(self.pc+1)
-        val2 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
         # Switch the order because we must read/write in little endian
         addr = val2 + val1
         value = self.hex(self.acc).upper()
@@ -128,7 +126,7 @@ class CPU:
     def addToAcc(self):
         # Store the values at the first and second postions
         val1 = _globals._memory_accessor.read(self.pc+1)
-        val2 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
         # Switch the order because we must read/write in little endian
         addr = val2 + val1
         # Read from memory with the corected endian format 
@@ -143,23 +141,52 @@ class CPU:
 
     # A2 -- Load the x register with a given constant
     def loadXRegConst(self):
-        pass
+        # get the constant operand and set the x_reg to it
+        self.x_reg = self.decimal(
+            _globals._memory_accessor.read(self.pc+1)
+        )
+        self.incPC(2)
 
     # AE -- Load the x register from memory
     def loadXRegMem(self):
-        pass
+        # Store the values at the first and second postions
+        val1 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
+        # Switch the order because we must read/write in little endian
+        addr = val2 + val1
+        # Read from memory with the corected endian format 
+        value = _globals._memory_accessor.read(
+            (self.decimal(addr))
+        )
+        # Finally, parse it from HEX to Decimal and load the x reg
+        self.x_reg = self.decimal(value)
+
+        self.incPC(3)
 
     # A0 -- Load the y register with a given constant
     def loadYRegConst(self):
-        pass
+        self.y_reg = self.decimal(_globals._mem.read(self.pc+1))
+        self.incPC(2)
 
     # AC -- Load the y register from memory
     def loadYRegMem(self):
-        pass
+        # Store the values at the first and second postions
+        val1 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
+        # Switch the order because we must read/write in little endian
+        addr = val2 + val1
+        # Read from memory with the corected endian format 
+        value = _globals._memory_accessor.read(
+            (self.decimal(addr))
+        )
+        # Finally, parse it from HEX to Decimal and load the y reg
+        self.y_reg = self.decimal(value)
+
+        self.incPC(3)
 
     # EA -- No Operation
     def noOP(self):
-        pass
+        self.incPC(1)
 
     # 00 -- break
     def progBreak(self):
@@ -173,16 +200,78 @@ class CPU:
     # EC -- Take a byte from memory and compare it 
     # with the x Register...if equal z flag is 0
     def xRegCompare(self):
-        pass
+        # Store the values at the first and second postions
+        val1 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
+        # Switch the order because we must read/write in little endian
+        addr = val2 + val1
+
+
+        # compare
+        if self.decimal(addr) == self.x_reg:
+            self.z_flag = 1
+        else:
+            self.z_flag = 0
+        
+        self.incPC(3)
 
     # D0 -- if Z flag is 0, branch x number of bytes
     def branch(self):
-        pass
+        if self.z_flag == 0:
+            branch_value = _globals._memory_accessor.read(self.pc+1)
+            branch_addr = self.decimal(branch_value) + self.pc
+
+            if branch_addr > _globals._pcm.running_process.limit%256:
+                branch_addr = branch_addr%256
+
+            self.pc = branch_addr + 2
+        else:
+            self.incPC(2)
 
     # EE -- Increment the value of a byte
     def incByte(self):
-        pass
+        # Store the values at the first and second postions
+        val1 = _globals._memory_accessor.read(self.pc+1)
+        val2 = _globals._memory_accessor.read(self.pc+2)
+        # Switch the order because we must read/write in little endian
+        addr = val2 + val1
+        value = self.decimal(_globals._memory_accessor.read(addr))
+        value += 1
+
+        _globals._memory_accessor.write(addr, self.hex(value))
+        
+        self.incPC(3)
 
     # FF -- System Call...print
     def sysCallPrint(self):
-        pass
+        string = ''
+
+        # #$01 in X reg = print the integer stored
+        if self.x_reg == 1:
+            string = str(self.y_reg)
+
+        # #$02 in X reg = print the 00-terminated string 
+        # stored at the address in the Y register.
+        elif self.x_reg == 2:
+            # find the address in memory and dont print 
+            # them unless there acutal letters...
+            byte_addr = self.y_reg
+            byte = _globals._memory_accessor.read(byte_addr)
+            char = chr(self.decimal(byte))
+            byte = ''
+            while byte != '00':
+                string += char
+                byte_addr += 1
+
+                byte = _globals._memory_accessor.read(byte_addr)
+                # Convert from decimal to ascii
+                char = chr(self.decimal(byte))
+        
+        _globals._kernel_interrupt_queue.enqueue(
+            Interrupt(
+                _globals.PRINT_IR, 
+                string
+            )
+        )
+        
+        self.incPC(1)

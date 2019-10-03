@@ -10,14 +10,14 @@ from typing import List
 class MemoryAccessor:
     """ Manages all segments of memory and enforces boundaries """
 
-    def read(self, address:str) -> str:
+    def read(self, address:int) -> str:
         """Given a memory addres the value stored at 
         the addr is returned
 
         Parameters
         ----------
-        address : str
-            The hex address of memory to read
+        address : int
+            The decimal address of memory to read
         Returns
         -------
         value : str
@@ -41,13 +41,13 @@ class MemoryAccessor:
         """
         return _globals._mem.memory[process.base:process.limit]
 
-    def write(self, address:str, value:str):
+    def write(self, address:int, value:str):
         """ Writes a value to a address in memory
 
         Parameters
         ----------
         address : str
-            The hex address of memory to write to
+            The decimal address of memory to write to
         value : str
             The hex value to write to memory
 
